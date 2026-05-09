@@ -1,0 +1,101 @@
+/* Mobile Floating Bottom Bar - 가장 중요한 전환 요소 */
+
+.floating-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: var(--color-white);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+    /* 기본적으로 숨김 */
+    padding: 0.5rem;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+    /* iOS Safe Area */
+}
+
+.floating-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.floating-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.floating-item:active {
+    transform: scale(0.95);
+}
+
+.floating-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.floating-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Primary (예약) 버튼 강조 */
+.floating-primary {
+    background: var(--color-accent);
+    color: var(--color-white);
+}
+
+.floating-primary:active {
+    background: var(--color-accent-dark);
+}
+
+.floating-primary .floating-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* 모바일에서만 표시 */
+@media (max-width: 768px) {
+    .floating-bar {
+        display: flex;
+    }
+}
+
+/* 태블릿 이상에서는 숨김 */
+@media (min-width: 769px) {
+    .floating-bar {
+        display: none;
+    }
+}
+
+/* 스크롤 시 애니메이션 */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.floating-bar {
+    animation: slideUp 0.3s ease-out;
+}
