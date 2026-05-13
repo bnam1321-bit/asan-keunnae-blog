@@ -36,8 +36,8 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-8">
         {posts.length === 0 ? (
           <div className="text-center py-32">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-stone-100 mb-8 shadow-sm border border-stone-200">
-              <span className="text-5xl">📝</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-stone-100 mb-6 shadow-sm border border-stone-200">
+              <span className="text-3xl">📝</span>
             </div>
             <h3 className="text-xl font-bold text-stone-800 mb-3">준비중입니다</h3>
             <p className="text-gray-500 text-lg">곧 유익한 건강정보를 만나보실 수 있습니다.</p>
