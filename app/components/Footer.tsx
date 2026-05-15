@@ -9,11 +9,13 @@ export default function Footer() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                     {/* Brand & Info */}
                     <div className="col-span-1 lg:col-span-2">
-                        <Link href="/" className="inline-flex items-center gap-2 mb-6 no-underline">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 border border-blue-100">
-                                <span className="text-lg">🏥</span>
-                            </div>
-                            <span className="text-xl font-black drop-shadow-sm" style={{ color: '#005b9f' }}>아산큰내과</span>
+                        <Link href="/" className="inline-flex items-center no-underline mb-6">
+                            <img 
+                                src="/images/logo.png" 
+                                alt="아산큰내과 로고" 
+                                className="h-10 sm:h-12 w-auto object-contain" 
+                                style={{ maxHeight: '48px' }} 
+                            />
                         </Link>
                         <p className="text-stone-600 mb-6 leading-relaxed">
                             인천 서구 검단 주민 여러분의 건강 주치의.<br />
