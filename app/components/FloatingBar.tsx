@@ -3,7 +3,7 @@
 export default function FloatingBar() {
     return (
         <div className="floating-bar">
-            <a href="tel:032-567-0750" className="floating-item">
+            <a href="tel:032-563-2770" className="floating-item">
                 <div className="floating-icon">📞</div>
                 <div className="floating-label">전화</div>
             </a>

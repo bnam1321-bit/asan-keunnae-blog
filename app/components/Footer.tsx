@@ -24,11 +24,17 @@ export default function Footer() {
                         <div className="space-y-3 text-sm text-stone-600">
                             <div className="flex items-start">
                                 <span className="font-bold w-16 shrink-0 text-stone-700">주소</span>
-                                <span>인천 서구 검단로 469 4층, 5층</span>
+                                <div>
+                                    <span className="block">인천광역시 서구 검단로 469(왕길동) 4, 5층</span>
+                                    <span className="block text-xs text-stone-500 mt-0.5">인천 2호선 검단 사거리역 1번출구 바로 앞 롯데리아 건물</span>
+                                </div>
                             </div>
                             <div className="flex items-start">
                                 <span className="font-bold w-16 shrink-0 text-stone-700">전화</span>
-                                <a href="tel:032-567-0750" className="hover:text-amber-700 transition-colors">032-567-0750</a>
+                                <div className="flex flex-col gap-1">
+                                    <a href="tel:032-563-2770" className="hover:text-amber-700 transition-colors">032.563.2770 <span className="text-stone-400 text-xs">(외래진료)</span></a>
+                                    <a href="tel:032-563-2780" className="hover:text-amber-700 transition-colors">032.563.2780 <span className="text-stone-400 text-xs">(인공신장실)</span></a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -43,20 +49,31 @@ export default function Footer() {
                             <li className="flex justify-between items-start border-b border-stone-100 pb-2">
                                 <span className="font-bold text-stone-800 w-20">평일</span>
                                 <div className="text-right text-stone-600">
-                                    <span className="block font-medium text-stone-900">08:30 - 18:00</span>
-                                    <span className="block text-xs font-bold text-amber-600 mt-0.5 mb-0.5">*26년 5월 1일부터 수요일 오후 휴진</span>
-                                    <span className="text-xs text-stone-500">휴게시간 13:00 - 14:00</span>
+                                    <span className="block"><span className="font-medium text-stone-900">외래진료</span> 08:00 - 18:00</span>
+                                    <span className="block"><span className="font-medium text-stone-900">인공신장실</span> 07:00 - 16:00</span>
                                 </div>
                             </li>
                             <li className="flex justify-between items-start border-b border-stone-100 pb-2">
                                 <span className="font-bold text-amber-700 w-20">토요일</span>
                                 <div className="text-right text-stone-600">
-                                    <span className="block font-medium text-stone-900">08:30 - 13:30</span>
-                                    <span className="text-xs text-stone-500">휴게시간 없음</span>
+                                    <span className="block"><span className="font-medium text-stone-900">외래진료</span> 08:00 - 13:00</span>
+                                    <span className="block"><span className="font-medium text-stone-900">인공신장실</span> 07:00 - 12:00</span>
+                                </div>
+                            </li>
+                            <li className="flex justify-between items-center border-b border-stone-100 pb-2">
+                                <span className="font-bold text-stone-500 w-20">점심시간</span>
+                                <div className="text-right">
+                                    <span className="text-stone-600">13:00 - 14:00</span>
+                                </div>
+                            </li>
+                            <li className="flex justify-between items-center border-b border-stone-100 pb-2">
+                                <span className="font-bold text-stone-800 w-24">대체공휴일</span>
+                                <div className="text-right">
+                                    <span className="text-stone-600">08:00 - 13:00</span>
                                 </div>
                             </li>
                             <li className="flex justify-between items-center pt-1">
-                                <span className="font-bold text-red-500 w-20">일/공휴일</span>
+                                <span className="font-bold text-red-500 w-20">일요일</span>
                                 <div className="text-right">
                                     <span className="inline-block px-2 py-1 bg-red-50 text-red-600 rounded text-xs font-bold">휴진</span>
                                 </div>

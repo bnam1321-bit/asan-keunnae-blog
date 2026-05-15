@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Premium Hero Header */}
-      <div className="relative overflow-hidden text-white bg-stone-900" style={{ backgroundImage: "url('/images/clinic-interior.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div className="relative overflow-hidden text-white bg-stone-900" style={{ backgroundImage: "url('/images/clinic-interior.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-[2px]"></div>
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-36">
           <div className="text-center">

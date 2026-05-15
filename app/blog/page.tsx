@@ -14,7 +14,7 @@ export default function BlogPage() {
     return (
         <div className="min-h-screen bg-stone-50">
             {/* Premium Hero Header */}
-            <div className="relative overflow-hidden text-white bg-stone-900 bg-[url('/images/clinic-interior.jpg')] bg-cover bg-center">
+            <div className="relative overflow-hidden text-white bg-stone-900 bg-[url('/images/clinic-interior.png')] bg-cover bg-center">
                 <div className="absolute inset-0 bg-stone-900/70 backdrop-blur-sm"></div>
                 <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
                     <div className="text-center">

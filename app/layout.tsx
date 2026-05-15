@@ -12,7 +12,7 @@ const jsonLd = {
   "name": "아산큰내과",
   "image": "https://asan-keunnae.co.kr/logo.png",
   "url": "https://asan-keunnae.co.kr",
-  "telephone": "032-567-0750",
+  "telephone": "032-563-2770",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "인천 서구 검단로 469 4층, 5층",
@@ -29,14 +29,14 @@ const jsonLd = {
     {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "08:30",
+      "opens": "08:00",
       "closes": "18:00"
     },
     {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": "Saturday",
-      "opens": "08:30",
-      "closes": "13:30"
+      "opens": "08:00",
+      "closes": "13:00"
     }
   ],
   "medicalSpecialty": "InternalMedicine"
