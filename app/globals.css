@@ -4,26 +4,26 @@
 
 /* Medical Premium Theme - 아산큰내과 */
 :root {
-  /* Medical Premium Color Palette (Warm Tone) */
-  --color-primary: #292524;
-  /* 메인 컬러: 다크 스톤 (전문성, 무게감) */
-  --color-accent: #B45309;
-  /* 포인트 컬러: 앰버 (신뢰, 따뜻함) */
-  --color-bg: #FAFAF9;
-  /* 배경 컬러: 웜 화이트 (청결함, 편안함) */
-  --color-text: #333333;
-  /* 텍스트 컬러: 다크 그레이 (가독성) */
-  --color-text-light: #666666;
+  /* Medical Premium Color Palette (Blue Tone) */
+  --color-primary: #005b9f;
+  /* 메인 컬러: 브랜드 딥 블루 (전문성, 신뢰감) */
+  --color-accent: #3296c8;
+  /* 포인트 컬러: 브랜드 라이트 블루 (청결함, 안정감) */
+  --color-bg: #F8FAFC;
+  /* 배경 컬러: 쿨 화이트 (청결함, 편안함) */
+  --color-text: #334155;
+  /* 텍스트 컬러: 슬레이트 다크 (가독성) */
+  --color-text-light: #64748B;
   /* 보조 텍스트 */
-  --color-border: #E5E7EB;
+  --color-border: #E2E8F0;
   /* border 컬러 */
   --color-white: #FFFFFF;
 
   /* Accent variations */
-  --color-accent-light: #FEF3C7;
-  /* 연한 앰버 배경 */
-  --color-accent-dark: #78350F;
-  /* 딥 앰버 */
+  --color-accent-light: #E0F2FE;
+  /* 연한 블루 배경 */
+  --color-accent-dark: #003a6c;
+  /* 다크 블루 */
 
   /* Success & Warning */
   --color-success: #28A745;

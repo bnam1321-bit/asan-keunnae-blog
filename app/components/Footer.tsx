@@ -32,8 +32,8 @@ export default function Footer() {
                             <div className="flex items-start">
                                 <span className="font-bold w-16 shrink-0 text-stone-700">전화</span>
                                 <div className="flex flex-col gap-1">
-                                    <a href="tel:032-563-2770" className="hover:text-amber-700 transition-colors">032.563.2770 <span className="text-stone-400 text-xs">(외래진료)</span></a>
-                                    <a href="tel:032-563-2780" className="hover:text-amber-700 transition-colors">032.563.2780 <span className="text-stone-400 text-xs">(인공신장실)</span></a>
+                                    <a href="tel:032-563-2770" className="hover:text-accent transition-colors">032.563.2770 <span className="text-stone-400 text-xs">(외래진료)</span></a>
+                                    <a href="tel:032-563-2780" className="hover:text-accent transition-colors">032.563.2780 <span className="text-stone-400 text-xs">(인공신장실)</span></a>
                                 </div>
                             </div>
                         </div>
@@ -54,7 +54,7 @@ export default function Footer() {
                                 </div>
                             </li>
                             <li className="flex justify-between items-start border-b border-stone-100 pb-2">
-                                <span className="font-bold text-amber-700 w-20">토요일</span>
+                                <span className="font-bold text-accent w-20">토요일</span>
                                 <div className="text-right text-stone-600">
                                     <span className="block"><span className="font-medium text-stone-900">외래진료</span> 08:00 - 13:00</span>
                                     <span className="block"><span className="font-medium text-stone-900">인공신장실</span> 07:00 - 12:00</span>
