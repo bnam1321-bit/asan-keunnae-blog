@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Medical Premium Theme - 아산큰내과 */
 :root {
