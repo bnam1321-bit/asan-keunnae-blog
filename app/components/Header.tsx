@@ -8,7 +8,9 @@ export default function Header() {
             <div className="header-container">
                 {/* Logo - Brand colors: teal + orange matching clinic identity */}
                 <Link href="/" className="logo flex items-center gap-2 no-underline">
-                    <img src="/images/logo.jpg" alt="아산큰내과 로고" className="h-10 w-auto object-contain" />
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 border border-blue-100">
+                        <span className="text-xl">🏥</span>
+                    </div>
                     <span className="text-xl font-black tracking-tight" style={{ color: '#005b9f' }}>
                         아산큰내과
                     </span>

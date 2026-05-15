@@ -10,7 +10,9 @@ export default function Footer() {
                     {/* Brand & Info */}
                     <div className="col-span-1 lg:col-span-2">
                         <Link href="/" className="inline-flex items-center gap-2 mb-6 no-underline">
-                            <img src="/images/logo.jpg" alt="아산큰내과 로고" className="h-8 w-auto object-contain" />
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 border border-blue-100">
+                                <span className="text-lg">🏥</span>
+                            </div>
                             <span className="text-xl font-black drop-shadow-sm" style={{ color: '#005b9f' }}>아산큰내과</span>
                         </Link>
                         <p className="text-stone-600 mb-6 leading-relaxed">
@@ -62,7 +64,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-stone-200 pt-8 text-center text-xs text-stone-400">
-                    <p>&copy; {new Date().getFullYear()} 아산큰내과. All rights reserved.</p>
+                    <p>&copy; 2026 아산큰내과. All rights reserved.</p>
                 </div>
             </div>
         </footer>
