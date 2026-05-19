@@ -9,13 +9,14 @@ export default function Footer() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                     {/* Brand & Info */}
                     <div className="col-span-1 lg:col-span-2">
-                        <Link href="/" className="inline-flex items-center no-underline mb-6">
-                            <img 
-                                src="/images/logo.png" 
-                                alt="아산큰내과 로고" 
-                                className="h-10 sm:h-12 w-auto object-contain" 
-                                style={{ maxHeight: '48px' }} 
-                            />
+                        <Link href="/" className="inline-flex items-center gap-2.5 no-underline mb-6">
+                            <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-white text-[10px] font-black tracking-tight leading-none"
+                                style={{ backgroundColor: '#005b9f', letterSpacing: '-0.3px' }}>
+                                <span style={{ fontSize: '8px', lineHeight: '1.2', textAlign: 'center' }}>ASAN<br/>KEUN</span>
+                            </span>
+                            <span className="text-xl font-black tracking-tight" style={{ color: '#005b9f' }}>
+                                아산큰내과
+                            </span>
                         </Link>
                         <p className="text-stone-600 mb-6 leading-relaxed">
                             인천 서구 검단 주민 여러분의 건강 주치의.<br />

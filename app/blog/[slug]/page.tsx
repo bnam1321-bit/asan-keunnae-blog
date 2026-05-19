@@ -169,8 +169,8 @@ export default async function BlogPostPage({ params }: Props) {
                 {/* Author & Clinic Info */}
                 <div className="bg-stone-50 rounded-3xl p-8 sm:p-10 mb-12 border border-stone-200">
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-stone-200 p-2">
-                            <img src="/images/logo.jpg" alt="아산큰내과 로고" className="w-full h-auto object-contain" />
+                        <div className="w-16 h-16 rounded-2xl bg-[#005b9f] flex items-center justify-center shadow-sm text-white font-black text-center leading-tight shrink-0" style={{ letterSpacing: '-0.5px' }}>
+                            <span style={{ fontSize: '12px' }}>ASAN<br/>KEUN</span>
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-gray-900 mb-1">아산큰내과</h3>
