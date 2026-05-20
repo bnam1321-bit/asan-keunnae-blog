@@ -7,14 +7,13 @@ export default function Header() {
         <header className="site-header">
             <div className="header-container">
                 {/* Logo - Brand colors: teal + orange matching clinic identity */}
-                <Link href="/" className="logo flex items-center gap-2.5 no-underline">
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white text-xs font-black tracking-tight leading-none"
-                        style={{ backgroundColor: '#005b9f', letterSpacing: '-0.3px' }}>
-                        <span style={{ fontSize: '9px', lineHeight: '1.2', textAlign: 'center' }}>ASAN<br/>KEUN</span>
-                    </span>
-                    <span className="text-xl font-black tracking-tight" style={{ color: '#005b9f' }}>
-                        아산큰내과
-                    </span>
+                <Link href="/" className="logo flex items-center no-underline">
+                    <img 
+                        src="/images/logo.png" 
+                        alt="아산큰내과 로고" 
+                        className="h-10 sm:h-12 w-auto object-contain" 
+                        style={{ maxHeight: '48px' }} 
+                    />
                 </Link>
 
                 {/* Navigation */}
