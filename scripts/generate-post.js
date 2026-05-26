@@ -2,14 +2,114 @@ const fs = require('fs');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { format } = require('date-fns');
-const { SYSTEM_PROMPT, KEYWORDS, CLINIC_INFO } = require('./prompts');
+const { SYSTEM_PROMPT, buildUserPrompt, KEYWORDS, CLINIC_INFO, validateOutput } = require('./prompts');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // Google Gemini 설정
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
+function detectClusterAndKeyword(topic) {
+    const topicText = topic.toLowerCase();
+    
+    // 신장질환 및 투석 클러스터
+    if (/(투석|혈액투석|신장|인공신장|신부전|동정맥루|사구체|콩팥|nephro|dialysis)/.test(topicText)) {
+        return {
+            cluster: "신장질환·인공신장 클리닉",
+            targetKeyword: "검단 인공신장센터",
+            extraContext: "FMC 5008S 인공신장기, EWB-1000 인공신장 정수처리기, 투석 전문 의료진 상주, 정기 초음파 동정맥루 확인 사실 포함"
+        };
+    }
+    
+    // 5대암 건강검진센터
+    if (/(검진|건강검진|국가검진|5대암|암검진|공단검진|종합검진|자궁경부|유방암)/.test(topicText)) {
+        return {
+            cluster: "건강검진센터(5대암)",
+            targetKeyword: "검단 국가건강검진",
+            extraContext: "국가 5대암 검진, 공단검진, 종합검진, 검진 대상 연령 및 주기 안내 포함"
+        };
+    }
+
+    // 초음파 클리닉
+    if (/(초음파|갑상선|경동맥|ultrasound)/.test(topicText)) {
+        return {
+            cluster: "초음파 클리닉",
+            targetKeyword: "검단 복부초음파",
+            extraContext: "복부, 갑상선, 경동맥, 신장 등 초음파 클리닉 운영 및 세부 전문의 진료 정보 포함"
+        };
+    }
+    
+    // 만성질환 클리닉
+    if (/(당뇨|혈압|고혈압|고지혈증|콜레스테롤|대사증후군|만성질환)/.test(topicText)) {
+        return {
+            cluster: "만성질환 클리닉",
+            targetKeyword: "검단 당뇨 내과",
+            extraContext: "고혈압, 당뇨병, 고지혈증 등 만성질환의 예방 및 체계적인 약물/생활습관 추적 관리 포함"
+        };
+    }
+    
+    // 내 몸 맞춤 클리닉 (수액, 접종 등)
+    if (/(수액|예방접종|접종|독감|비만|영양수액)/.test(topicText)) {
+        return {
+            cluster: "내 몸 맞춤 클리닉",
+            targetKeyword: "검단 예방접종",
+            extraContext: "영양수액 치료, 예방접종(독감, 대상포진, 폐렴구균 등) 종류 및 적응증 사실 기술 포함"
+        };
+    }
+    
+    // 기본값: 소화기·내시경 클리닉
+    return {
+        cluster: "소화기·내시경 클리닉",
+        targetKeyword: "검단 위내시경",
+        extraContext: "올림푸스 최신 내시경 기종 사용, 소화기내시경 세부전문의 직접 검사 및 당일 용종절제 사실 포함"
+    };
+}
+
+function parseMetaBlock(text, today) {
+    const metaRegex = /(?:\[META\]|```\[META\]|```meta)\s*([\s\S]+?)(?:```|---|\n\n)/i;
+    const match = text.match(metaRegex);
+    const metaData = {
+        title: '',
+        date: today,
+        description: '',
+        slug: '',
+        author: '소화기내과 전문의',
+        target_keyword: '',
+        cluster: ''
+    };
+
+    if (match) {
+        const metaContent = match[1];
+        const lines = metaContent.split('\n');
+        lines.forEach(line => {
+            const separatorIndex = line.indexOf(':');
+            if (separatorIndex !== -1) {
+                const key = line.slice(0, separatorIndex).trim().toLowerCase();
+                const value = line.slice(separatorIndex + 1).trim()
+                    .replace(/^[,"'\s\\]+|[,"'\s\\]+$/g, ''); // 앞뒤의 쉼표, 따옴표, 백슬래시, 공백을 모두 제거
+                
+                if (key.includes('seo_title')) metaData.title = value;
+                else if (key.includes('h1') && !metaData.title) metaData.title = value;
+                else if (key.includes('meta_description')) metaData.description = value;
+                else if (key.includes('url_slug')) metaData.slug = value;
+                else if (key.includes('published')) metaData.date = value;
+                else if (key.includes('author_role')) metaData.author = value;
+                else if (key.includes('target_keyword')) metaData.target_keyword = value;
+                else if (key.includes('cluster')) metaData.cluster = value;
+            }
+        });
+    }
+
+    // fallback 값을 위해 H1 제목 정규식 매칭 시도
+    if (!metaData.title) {
+        const h1Match = text.match(/^#\s+(.+)$/m);
+        if (h1Match) metaData.title = h1Match[1].trim();
+    }
+
+    return metaData;
+}
+
 async function generatePost() {
-    console.log('🤖 AI(Gemini) 의사선생님이 글을 쓸 준비를 하고 있습니다...');
+    console.log('🤖 아산큰내과 GEO + Google SEO v3.2 AI 포스팅 엔진 시작...');
 
     if (!process.env.GOOGLE_API_KEY) {
         console.error('❌ GOOGLE_API_KEY가 없습니다. .env 파일을 확인해주세요.');
@@ -60,194 +160,151 @@ async function generatePost() {
         } catch (e) {
             console.error("❌ 주제 생성 실패, 기본 리스트 사용", e);
             const healthTopics = [
-                '환절기 독감 예방과 접종의 중요성',
-                '직장인 만성피로와 수액 치료',
-                '속쓰림과 위염, 위내시경이 필요한 순간',
-                '대장용종과 대장내시경 검사의 주기',
-                '고혈압 환자의 겨울철 건강 관리',
-                '당뇨병 초기 증상과 식이요법',
-                '지방간 예방을 위한 생활 습관',
-                '비타민D 결핍과 주사 치료',
-                '대상포진 초기 증상과 예방접종',
-                '헬리코박터균 감염과 제균 치료'
+                '위내시경 검사 전 금식 시간과 물 섭취 가이드',
+                '대장내시경 전 용종 발견 시 당일 제거 치료',
+                '만성콩팥병 환자가 혈액투석을 시작해야 하는 시점',
+                '고지혈증 관리를 위한 생활 요법과 추적 혈액검사',
+                '당뇨병 환자의 만성 신부전 합병증 예방법',
+                '복부초음파 검사로 조기 진단 가능한 복부 장기 질환',
+                '고혈압 관리 중 동정맥루와 혈액투석 주기',
+                '지방간 예방을 위한 식습관과 복부초음파 중요성'
             ];
             topic = healthTopics[Math.floor(Math.random() * healthTopics.length)];
             console.log(`📝 랜덤 선택 주제: [${topic}]`);
         }
     }
 
+    const { cluster, targetKeyword, extraContext } = detectClusterAndKeyword(topic);
+    console.log(`📂 자동 분류 클러스터: [${cluster}]`);
+    console.log(`🔑 타겟 키워드: [${targetKeyword}]`);
+
     // KST 기준으로 날짜 설정 (UTC+9)
     const kstDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
     const today = format(kstDate, 'yyyy-MM-dd');
 
-    // 2. 글 작성 (Updated Gemini API)
+    let userPrompt = buildUserPrompt({ topic, targetKeyword, cluster, extraContext });
+
+    // 2. 글 작성 (Self-Correction Loop 적용)
     let content = "";
+    const MAX_ATTEMPTS = 3;
+    let attempts = 0;
+    let validationResult = { passed: false, issues: [] };
 
-    // 재시도 로직 추가
-    const MAX_RETRIES = 3;
-    let lastError = null;
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    while (attempts < MAX_ATTEMPTS && !validationResult.passed) {
+        attempts++;
         try {
-            console.log(`🚀 Gemini 2.5 Pro 모델로 글 작성 시도 (${attempt}/${MAX_RETRIES})...`);
+            console.log(`🚀 Gemini 2.5 Pro 모델 호출 시도 (${attempts}/${MAX_ATTEMPTS})...`);
             const model = genAI.getGenerativeModel({
                 model: "gemini-2.5-pro",
                 generationConfig: {
-                    temperature: 0.7,
+                    temperature: 0.5, // 팩트 및 지시사항 준수율을 높이기 위해 낮은 온도로 설정
                     topP: 0.8,
                     topK: 40,
                     maxOutputTokens: 8192,
                 }
             });
 
-            const fullPrompt = `${SYSTEM_PROMPT}
+            // 검증 오류 피드백 프롬프트 추가
+            let currentPrompt = userPrompt;
+            if (attempts > 1 && validationResult.issues.length > 0) {
+                console.log(`⚠️ 이전 출력에 검증 오류가 있습니다. 피드백을 전달하여 재작성을 요청합니다.`);
+                currentPrompt += `\n\n[🚨 재시도 피드백: 이전 출력에서 다음과 같은 검증 오류가 발생했습니다. 아래 지적 사항을 반드시 해결하여 전체 본문을 처음부터 다시 생성하십시오.]\n- ${validationResult.issues.join('\n- ')}`;
+            }
 
-## 병원 기본 정보 (글 작성 시 참고용 - 포스팅에 직접 기재하지 말 것)
-- 병원명: 아산큰내과의원
-- 소재지: 인천 서구 검단로 469 4층, 5층
-- 기관 유형: 여성소화기내과 전문의, 신장내과 전문의 2인 진료 의원
-- 주요 진료: 위·대장내시경, 건강검진(채용검진), 만성질환(고혈압, 당뇨병, 고지혈증 등), 초음파 클리닉, 수액 치료
-- 대표 번호: 032-567-0750
-
-## 입력된 주제
-- **주제**: "${topic}"
-- **타겟**: 해당 증상으로 고민하는 환자, 가족, 건강에 관심있는 일반인
-- **핵심 키워드**: ${KEYWORDS.join(', ')}
-
-
-## 출력 요구사항
-
-**반드시 다음 Frontmatter로 시작:**
----
-title: "(매력적이고 검색 최적화된 제목)"
-date: "${today}"
-description: "(환자 검색어 기준, 160자 이내, 클리닉명 절대 포함 X)"
-tags: ["(해당 포스트의 핵심 질환명, 예: 위염, 당뇨병 등)", "검단신도시내과", "검단내과", "인천 서구 검단 내과", "주제관련태그1", "주제관련태그2"]
-author: "아산큰내과"
-coverImage: ""
----
-
-**본문 구성:**
-
-## 새로운 글쓰기 패턴 (매우 중요)
-- **태그 (Tags) 구성**: tags 배열의 첫 번째 요소에는 반드시 포스트가 주로 다루는 핵심 질환이름(예: "위염", "고지혈증", "지방간", "당뇨병", "고혈압", "장염" 등 단어 위주)을 지정하십시오. 두 번째와 세 번째 요소에는 "검단신도시내과", "검단내과"를 넣고, 그 뒤에 관련 있는 다른 세부 키워드를 지정하십시오.
-- **주제 내용**: [원장님 진료 경험에서 본 패턴] 1~2개를 반드시 포함하세요.
-- **형식**: 자유롭게 구성하되 (질문 도입, 사례 도입, 통계 도입, 비교 도입) 중 랜덤으로 하나를 선택하여 시작하세요. 기계적인 H2 구조(원인, 증상, 치료 등)를 탈피하세요.
-- **어조**: 진료실에서 환자에게 설명하듯 1인칭 표현("제가 진료를 보면서...", "저희 의원에 오시는 분들 중...")을 자연스럽게 일부 사용하세요.
-- **메타 디스크립션**: 환자가 실제로 검색할 만한 검색어 기준으로 작성하고, 클리닉명(병원명)은 **절대 포함하지 마세요**.
-- **글 끝부분 마무리**: 병원 정보나 원장의 약력을 기계적으로 나열(예: '저는 누구입니다', '저희 병원은 무엇을 진료합니다' 등)하지 마십시오. 글의 결론과 환자를 격려하는 말로 자연스럽게 마무리하십시오. (원장 약력이나 진료 항목을 별도 소개 단락 형태로 억지로 채워 넣는 것을 엄격히 금지합니다.)
-
-
----
-
-> 💡 **진료 안내 및 주의사항**  
-> 본 게시물은 의료법 제56조 1항을 준수하여 의료 정보 제공 목적으로 작성되었습니다.  
-> 제공된 의학 정보는 환자의 상태 및 체질에 따라 진료 결과가 다를 수 있으며, 부작용이 발생할 수 있으므로 시술 전 반드시 내과 전문의와 충분한 상담을 진행하시기 바랍니다.
-
-## 주의사항
-- 의료광고법을 철저히 준수할 것
-- 치료 효과 보장 표현 금지
-- '최고', '최상' 등 최상급 표현 금지
-- 단정적 표현 대신 "~ 도움이 됩니다", "~ 권장됩니다" 사용
-- 부작용과 주의사항을 반드시 포함
-- 본문은 반드시 3,000자 이상 작성할 것 (핵심 정보를 충분히 포함)
-`;
-
-            const result = await model.generateContent(fullPrompt);
+            const result = await model.generateContent([
+                { text: SYSTEM_PROMPT },
+                { text: currentPrompt }
+            ]);
+            
             const response = await result.response;
-            content = response.text();
-            console.log("✨ Gemini 2.5 Pro 작성 성공!");
-            console.log(`📄 생성된 글 길이: ${content.length}자`);
-            break; // 성공하면 루프 종료
+            content = response.text().trim();
+            
+            // 검증 수행
+            console.log(`🔍 생성된 출력 검증 중...`);
+            validationResult = validateOutput(content);
+            
+            if (validationResult.passed) {
+                console.log(`✅ 검증 통과! (글자수: 공백제외 ${validationResult.charCount}자, 브랜드 노출: ${validationResult.brandCount}회)`);
+            } else {
+                console.warn(`❌ 검증 실패 (오류 항목 수: ${validationResult.issues.length}개):`);
+                validationResult.issues.forEach(issue => console.warn(`   - ${issue}`));
+            }
 
         } catch (apiError) {
-            lastError = apiError;
-            console.error(`❌ Gemini API 오류 (시도 ${attempt}/${MAX_RETRIES}):`, apiError.message);
-
-            if (attempt < MAX_RETRIES) {
-                console.log(`⏳ ${attempt * 2}초 후 재시도...`);
-                await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+            console.error(`❌ Gemini API 오류 (시도 ${attempts}/${MAX_ATTEMPTS}):`, apiError.message);
+            if (attempts < MAX_ATTEMPTS) {
+                await new Promise(resolve => setTimeout(resolve, 3000));
             }
         }
     }
 
-    // 모든 재시도 실패 시 Fallback
+    // 만약 최종적으로도 실패했으나 글이 있다면 일단 저장 시도
     if (!content) {
-        console.error('📋 모든 재시도 실패. Fallback 콘텐츠 생성...');
-        console.error('📋 마지막 에러:', JSON.stringify(lastError, null, 2));
-
-        // 주제별 맞춤 컨텐츠 생성 (Fallback)
-        const topicContent = generateTopicContent(topic);
-        content = `---
-title: "${topic}"
-date: "${today}"
-description: "${topicContent.description}"
-tags: ${JSON.stringify(topicContent.tags)}
-author: "아산큰내과"
-coverImage: ""
----
-
-${topicContent.content}
-
----
-
-> 💡 **중요 안내**  
-> 본 정보는 일반적인 건강 가이드이며, 개인의 상태에 따라 다를 수 있습니다.  
-> 정확한 진단과 치료를 위해서는 반드시 전문의와 상담하시기 바랍니다.
-`;
+        console.error('📋 모든 시도 실패. 포스팅 생성을 중단합니다.');
+        process.exit(1);
     }
 
-    // 3. 이미지 설정 (SEO 및 OG 태그용)
+    // 3. META 파싱 및 Frontmatter 포맷팅
+    const metaData = parseMetaBlock(content, today);
+    
+    // 이미지 선택
     const stockImages = ['consultation.jpg', 'equipment.jpg', 'wellness.jpg', 'lab.jpg'];
     const randomStock = stockImages[Math.floor(Math.random() * stockImages.length)];
     const imagePath = `/images/stock/${randomStock}`;
 
-    console.log(`🖼️ SEO/OG용 커버 이미지 메타데이터 설정: ${imagePath}`);
-
-    if (content.includes('coverImage:')) {
-        content = content.replace(/coverImage: ""/, `coverImage: "${imagePath}"`);
+    // 본문 내용 정제 ([META] 부분 제거)
+    let cleanContent = content.replace(/(?:\[META\]|```\[META\]|```meta)[\s\S]+?(?:```|---)\s*/gi, '').trim();
+    
+    // AI가 본문 전체를 불필요하게 ```markdown ... ``` 또는 ``` ... ``` 으로 한 번 더 감쌌을 경우 이를 제거
+    if (cleanContent.startsWith('```')) {
+        cleanContent = cleanContent.replace(/^```[a-zA-Z]*\n/, ''); // 첫 줄의 ``` 또는 ```markdown 제거
+        cleanContent = cleanContent.replace(/\n```$/, ''); // 마지막 줄의 ``` 제거
     }
+    cleanContent = cleanContent.trim();
+    
+    // 질환명 추출
+    let mainDisease = "내과질환";
+    if (metaData.target_keyword) {
+        mainDisease = metaData.target_keyword
+            .replace(/(인천\s*서구|검단신도시|검단사거리|검단|왕길동)\s*/g, '')
+            .replace(/^[,"'\s\\]+|[,"'\s\\]+$/g, '') // 여분의 특수문자 제거
+            .trim();
+    }
+
+    const finalTags = [mainDisease, "검단신도시내과", "검단내과", "인천 서구 검단 내과"];
+
+    // 마크다운 파일 조립 (Next.js 호환 Frontmatter 구성)
+    const finalFileContent = `---
+title: "${metaData.title || topic}"
+date: "${metaData.date}"
+description: "${metaData.description}"
+tags: ${JSON.stringify(finalTags)}
+author: "아산큰내과"
+coverImage: "${imagePath}"
+author_role: "${metaData.author}"
+target_keyword: "${metaData.target_keyword}"
+cluster: "${metaData.cluster}"
+---
+
+${cleanContent}
+`;
 
     // 4. 파일 저장
-
-    // SEO 최적화된 Slug 생성을 위한 추가 요청
-    let slug = "";
-    try {
-        const slugModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-        const slugPrompt = `
-        블로그 글 제목: "${topic}"
-        
-        위 제목을 바탕으로 검색 엔진 최적화(SEO)에 유리한 영문 URL Slug를 만들어주세요.
-        - 규칙: 소문자, 하이픈(-) 연결, 특수문자 제거
-        - 예시: "겨울철 독감 예방" -> "preventing-winter-flu-symptoms"
-        - 출력: 슬러그만 출력 (다른 텍스트 없이)
-        `;
-        const slugResult = await slugModel.generateContent(slugPrompt);
-        slug = slugResult.response.text().trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-        console.log(`🔗 생성된 Slug: ${slug}`);
-    } catch (e) {
-        console.error("Slug 생성 실패, 타임스탬프로 대체", e);
-        slug = Math.random().toString(36).substring(7);
+    let filenameSlug = metaData.slug || today;
+    filenameSlug = filenameSlug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
+    if (!filenameSlug) {
+        filenameSlug = Math.random().toString(36).substring(7);
     }
 
-    const filename = `${today}-${slug}.md`;
+    const filename = `${today}-${filenameSlug}.md`;
     const postsDirLink = path.join(__dirname, '../content/posts');
 
     if (!fs.existsSync(postsDirLink)) {
         fs.mkdirSync(postsDirLink, { recursive: true });
     }
 
-    fs.writeFileSync(path.join(postsDirLink, filename), content || "");
-    console.log(`✅ 글 작성 완료: content/posts/${filename}`);
-}
-
-function generateTopicContent(topic) {
-    const defaultContent = {
-        description: `전문의가 알려주는 ${topic.split(' ')[0]} 건강 가이드입니다.`,
-        tags: ['건강정보', '내과', '진료안내'],
-        content: `## ${topic}\n\n**아산큰내과**입니다.\n\n(본문 생성 실패로 인한 기본 템플릿입니다.)`
-    };
-    return defaultContent;
+    fs.writeFileSync(path.join(postsDirLink, filename), finalFileContent);
+    console.log(`🎉 최종 포스트 저장 완료: content/posts/${filename}`);
 }
 
 generatePost();
