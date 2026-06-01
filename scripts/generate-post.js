@@ -276,6 +276,14 @@ async function generatePost() {
     // VALIDATION 코멘트 주석 제거
     const validationRegex = /<!--\s*VALIDATION[\s\S]+?-->/gi;
     cleanContent = cleanContent.replace(validationRegex, '').trim();
+
+    // 내부링크 제안 제거
+    const internalLinkRegex = /(?:\[내부링크\s*제안\]|\[내부링크\s+제안\])[\s\S]*$/i;
+    cleanContent = cleanContent.replace(internalLinkRegex, '').trim();
+
+    // 이미지 가이드 텍스트 제거 ([이미지: ... / alt="..." / filename="..."])
+    const imageGuideRegex = /\[이미지\s*:[\s\S]*?\]/gi;
+    cleanContent = cleanContent.replace(imageGuideRegex, '').trim();
     
     // 질환명 추출
     let mainDisease = "내과질환";
