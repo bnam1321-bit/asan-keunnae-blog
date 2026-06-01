@@ -261,6 +261,21 @@ async function generatePost() {
         cleanContent = cleanContent.replace(/\n```$/, ''); // 마지막 줄의 ``` 제거
     }
     cleanContent = cleanContent.trim();
+
+    // FAQPage JSON-LD 추출 및 제거
+    const faqJsonRegex = /(?:\[FAQPage\s+JSON-LD\]|\[FAQPage\s*JSON-LD\])\s*```json([\s\S]+?)```/i;
+    const faqMatch = cleanContent.match(faqJsonRegex);
+    let faqJsonLd = "";
+    if (faqMatch) {
+        faqJsonLd = faqMatch[1].trim();
+        cleanContent = cleanContent.replace(faqJsonRegex, '').trim();
+    }
+    // 예외적인 FAQ 블록 마크업 잔여 제거
+    cleanContent = cleanContent.replace(/\[FAQPage\s+JSON-LD\]\s*[\s\S]*?(?:```json|```)[\s\S]*?```/gi, '').trim();
+
+    // VALIDATION 코멘트 주석 제거
+    const validationRegex = /<!--\s*VALIDATION[\s\S]+?-->/gi;
+    cleanContent = cleanContent.replace(validationRegex, '').trim();
     
     // 질환명 추출
     let mainDisease = "내과질환";
@@ -274,7 +289,7 @@ async function generatePost() {
     const finalTags = [mainDisease, "검단신도시내과", "검단내과", "인천 서구 검단 내과"];
 
     // 마크다운 파일 조립 (Next.js 호환 Frontmatter 구성)
-    const finalFileContent = `---
+    let finalFileContent = `---
 title: "${metaData.title || topic}"
 date: "${today}"
 description: "${metaData.description}"
@@ -284,10 +299,15 @@ coverImage: "${imagePath}"
 author_role: "${metaData.author}"
 target_keyword: "${metaData.target_keyword}"
 cluster: "${metaData.cluster}"
----
-
-${cleanContent}
 `;
+
+    if (faqJsonLd) {
+        // YAML multi-line 포맷을 위해 들여쓰기 2칸을 보장하여 주입합니다.
+        const indentedJson = faqJsonLd.split('\n').map(line => `  ${line}`).join('\n');
+        finalFileContent += `faq_json_ld: |\n${indentedJson}\n`;
+    }
+
+    finalFileContent += `---\n\n${cleanContent}\n`;
 
     // 4. 파일 저장
     let filenameSlug = metaData.slug || today;

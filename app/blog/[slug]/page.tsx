@@ -94,6 +94,12 @@ export default async function BlogPostPage({ params }: Props) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
+            {post.faq_json_ld && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: post.faq_json_ld }}
+                />
+            )}
 
             {/* Back Navigation */}
             <div className="bg-white border-b border-gray-100">

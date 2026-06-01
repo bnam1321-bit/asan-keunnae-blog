@@ -12,6 +12,7 @@ export type Post = {
     tags: string[];
     content: string;
     coverImage?: string;
+    faq_json_ld?: string;
 };
 
 export function getAllPosts(): Post[] {

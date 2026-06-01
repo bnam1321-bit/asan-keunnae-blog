@@ -8,6 +8,37 @@ coverImage: "/images/stock/consultation.jpg"
 author_role: "소화기내과 전문의"
 target_keyword: "검단 위내시경"
 cluster: "소화기·내시경 클리닉"
+faq_json_ld: |
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "대상포진은 다른 사람에게 전염되나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "아니요, 대상포진 자체가 전염되지는 않습니다. 하지만 대상포진 환자의 수포액에 직접 접촉할 경우, 수두를 앓은 적이 없거나 예방접종을 하지 않은 사람에게 수두를 유발할 수 있습니다. 따라서 수포에 딱지가 앉을 때까지는 영유아나 임산부와의 접촉을 피하는 것이 좋습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "대상포진 예방접종은 언제, 누가 맞는 것이 좋은가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "대상포진 예방접종은 50세 이상의 모든 성인에게 권장됩니다. 과거 대상포진을 앓았던 경우에도 재발 방지를 위해 접종이 가능하며, 최소 6~12개월의 간격을 두고 접종하는 것을 권고합니다. 면역저하자의 경우 접종 가능 여부를 전문의와 상담해야 합니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "대상포진 치료 후에도 통증이 계속될 수 있나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "네, 가능합니다. 이를 '대상포진 후 신경통(Postherpetic Neuralgia, PHN)'이라고 하며, 대상포진의 가장 흔한 합병증입니다. 피부 발진이 사라진 후에도 신경 손상으로 인해 통증이 지속되는 상태로, 고령일수록 발생 위험이 높습니다. 72시간 내 조기 치료가 합병증 예방에 도움이 될 수 있습니다."
+        }
+      }
+    ]
+  }
 ---
 
 # 대상포진 초기증상과 골든타임, 놓치지 않으려면 어떻게 해야 할까요?
@@ -97,50 +128,4 @@ cluster: "소화기·내시경 클리닉"
 - [국가 5대암 건강검진, 인천 서구 검단에서 받으세요](https://example.com/national-cancer-screening) (사유: 대상포진이 면역력 저하와 관련 있으므로, 전반적인 건강 상태를 점검하는 국가검진 정보와 연결)
 - [수면 위내시경 과정과 준비사항 A to Z](https://example.com/sedated-gastroscopy-guide) (사유: 본문에서 언급된 '검단 위내시경'에 대한 구체적인 정보를 제공하여 사용자의 추가 궁금증을 해소)
 
-[FAQPage JSON-LD]
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "대상포진은 다른 사람에게 전염되나요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "아니요, 대상포진 자체가 전염되지는 않습니다. 하지만 대상포진 환자의 수포액에 직접 접촉할 경우, 수두를 앓은 적이 없거나 예방접종을 하지 않은 사람에게 수두를 유발할 수 있습니다. 따라서 수포에 딱지가 앉을 때까지는 영유아나 임산부와의 접촉을 피하는 것이 좋습니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "대상포진 예방접종은 언제, 누가 맞는 것이 좋은가요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "대상포진 예방접종은 50세 이상의 모든 성인에게 권장됩니다. 과거 대상포진을 앓았던 경우에도 재발 방지를 위해 접종이 가능하며, 최소 6~12개월의 간격을 두고 접종하는 것을 권고합니다. 면역저하자의 경우 접종 가능 여부를 전문의와 상담해야 합니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "대상포진 치료 후에도 통증이 계속될 수 있나요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "네, 가능합니다. 이를 '대상포진 후 신경통(Postherpetic Neuralgia, PHN)'이라고 하며, 대상포진의 가장 흔한 합병증입니다. 피부 발진이 사라진 후에도 신경 손상으로 인해 통증이 지속되는 상태로, 고령일수록 발생 위험이 높습니다. 72시간 내 조기 치료가 합병증 예방에 도움이 될 수 있습니다."
-      }
-    }
-  ]
-}
-```
 
-<!-- VALIDATION (게시 시 삭제)
-- 금지어 검사: PASS
-- [META] 블록 완비: YES (seo_title 40자, meta_description 113자, author_role 명시)
-- 브랜드 풀네임("아산큰내과의원") 노출: 3회
-- 검사/검진/투석 정식명 노출 목록: [대상포진(Herpes Zoster), 위내시경(EGD, Esophagogastroduodenoscopy), 복부초음파, 5대암 검진, 대상포진 후 신경통(Postherpetic Neuralgia, PHN)]
-- 지역 키워드(인천 서구/검단/왕길동) 노출: [인천 서구, 검단, 왕길동, 검단사거리역]
-- 타겟 키워드 H1·도입·H2 분산: YES (도입부에 1회 포함)
-- Atomic Fact 단정문 개수: 15+
-- FAQ 문답 수 + JSON-LD 1:1 일치: YES (3문답)
-- 자기정의 문장 / 작성·감수(전공만) / NAP·전화: YES
-- 이미지 가이드(alt+filename) 수: 2
-- 본문 글자수(공백제외): 1898
--->
