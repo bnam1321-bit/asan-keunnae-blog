@@ -276,7 +276,7 @@ async function generatePost() {
     // 마크다운 파일 조립 (Next.js 호환 Frontmatter 구성)
     const finalFileContent = `---
 title: "${metaData.title || topic}"
-date: "${metaData.date}"
+date: "${today}"
 description: "${metaData.description}"
 tags: ${JSON.stringify(finalTags)}
 author: "아산큰내과"
